@@ -1,0 +1,251 @@
+/*
+ * Copyright (c) 2024 John Newton
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+*, *:before, *::before, *:after, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font-color: var(--sl-color-gray-700);
+  --link-color: var(--sl-color-gray-700);
+}
+
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  /* line-height: 24px;  */
+  font-weight: 400;
+  color: --var(font-color);
+  /* background-color: #f6f6f6; */
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  color: var(--font-color);
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+a {
+  color: var(--link-color);
+}
+
+h1 {
+  margin-bottom: 2rem;
+}
+
+.main-container {
+  flex: 1;
+}
+
+.main-container.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.main-container.block {
+  margin: 0 auto;
+  padding-top: 3rem;
+  width: 100%;
+}
+
+.hidden {
+  display: none;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+header > nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  padding: 0.5rem;
+}
+
+header a,
+footer a {
+  text-decoration: none;
+}
+
+sl-button[variant="primary"] {
+  width: 100%;
+}
+
+sl-spinner {
+  font-size: 5rem;
+}
+
+.spinner-box {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.temp-alert {
+  margin-bottom: 2rem;
+}
+
+.social-link img {
+  max-width: 2rem;
+}
+
+.flash-container {
+  margin-bottom: 1rem;
+  min-height: 4.5rem;
+}
+
+.registration-title,
+.login-title {
+  margin: 0 auto;
+}
+
+.registration-title,
+.login-title,
+.registration-form-box,
+.login-form-box {
+  width: 40%;
+  /* max-width: 18rem; */
+}
+
+.login-box,
+.registration-box {
+  max-width: 35rem;
+}
+
+.registration-form-box {
+  margin: 0 auto;
+}
+
+.new-todo-list-form-box {
+  display: flex;
+}
+
+.new-todo-list-form {
+  margin: 0 auto 3rem auto;
+}
+
+.new-todo-list-inputs-box {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.todo-lists-box,
+.todo-list-box {
+  width: 100%;
+}
+
+.todo-list-links {
+  text-align: center;
+}
+
+.todo-list-links-list {
+  list-style: none;
+}
+
+.todo-list-links-list li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid gray;
+  border-radius: 3px;
+  width: 100%;
+  padding: 0.5rem;
+  list-style: none;
+  margin-bottom: 1rem;
+}
+
+.todo-list-link-item__link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 1;
+  text-align: center;
+  line-height: 1;
+}
+
+.todo-list-link-item__controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.todo-list-links-list a {
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.new-todo-item-form,
+.todo-list-item {
+  margin-bottom: 1rem;
+}
+
+.actions {
+  text-align: right;
+}
+
+.new-item-button {
+  max-width: 6rem;
+}
+
+.todo-list-item {
+  display: flex;
+  align-items: center;
+}
+
+.todo-list-item sl-checkbox {
+  flex: 1;
+}
+
+.todo-list-item-patch-form {
+  width: 100%;
+}
+
+@media (min-width: 30rem) {
+  body {
+    margin: 0 auto;
+    max-width: 50rem;
+    padding: 1rem;
+  }
+
+  /* FIXME: conditionally add class to .main-container (layout) */
+  .main-container.expand-horizontal {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
