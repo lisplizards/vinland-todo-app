@@ -30,17 +30,18 @@ certain pages should only be accessible to signed-in users."
     (redirect-to-sign-in)
     (halt)))
 
-(declaim (ftype (function (&key (location string)) null) require-no-login))
-(defun require-no-login (&key (location "/lists"))
+(declaim (ftype (function () null) require-no-login))
+(defun require-no-login ()
   "Redirects to the lists page unless *CURRENT-USER* is bound. Used to redirect from specific
 pages like login and registration that should not be accessible to signed-in users."
-  (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type string location))
-  (when *current-user*
-    (case (lack.request:request-method vinland:*request*)
-      (:GET (redirect location :status 302))
-      (t (redirect location :status 303)))
-    (halt)))
+  (declare (optimize (speed 3) (safety 0) (debug 0)))
+  (let ((response-code (case (lack.request:request-method vinland:*request*)
+                         (:GET 302)
+                         (:HEAD 302)
+                         (t 303))))
+    (declare (type integer response-code))
+    (when *current-user*
+      (halt `(,response-code (:location "/lists"))))))
 
 (declaim (ftype (function () null) redirect-to-sign-in))
 (defun redirect-to-sign-in ()

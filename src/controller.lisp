@@ -10,12 +10,10 @@
 (define-controller 'root
   :export t
   :method '(:HEAD :GET :OPTIONS)
-  :before  (list #'cache-control)
+  :before  (list #'cache-control #'require-no-login)
   :GET (lambda ()
          (declare (optimize (speed 3) (safety 0) (debug 0)))
-         (redirect (if *current-user*
-                       "/lists"
-                       "/login")))
+         (redirect "/login"))
   :documentation "The root resource redirects to the current user's lists collection resource when
 there is a current session, otherwise redirects to the sign-in page")
 
