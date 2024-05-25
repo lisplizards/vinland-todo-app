@@ -21,6 +21,7 @@
                              (request-method (eql :POST))
                              params)
   (declare (ignore route request-method)
+           (type symbol route)
            (type list params))
   (handler-case (let ((params
                         (validate

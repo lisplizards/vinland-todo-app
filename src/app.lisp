@@ -5,6 +5,7 @@
 
 (defparameter *app*
   (lack:builder
+   :request-id
    (:http-methods :methods '(:HEAD :GET :POST :PUT :PATCH :DELETE :OPTIONS))
    :head
    (:security-headers
@@ -34,17 +35,34 @@
                (rplacd (last (second response)) '(:cache-control "max-age=3600")))
              response)
            (funcall app env))))
-   (:session :store (lack/session/store/memory:make-memory-store)
+   (:redis :pools '((:pool-id :page-visits
+                     :host "localhost"
+                     :max-open-count 10
+                     :max-idle-count 4)))
+   (:session :store (lack/middleware/session/store/redis-pool:make-redis-store
+                     :host "localhost"
+                     :max-open-count 4
+                     :max-idle-count 2)
              :state (lack/session/state/cookie:make-cookie-state
                      :cookie-key "_sid"
                      :path "/"
                      :domain "localhost"
-                     :expires (+ 600 (get-universal-time))
+                     :expires 600
                      :httponly t
                      :secure nil
                      :samesite :strict))
    :csrf
    :flash
+   (lambda (app)
+     (declare (type function app))
+     (lambda (env)
+       (declare (optimize (speed 3) (safety 0) (debug 0))
+                (type list env))
+       (when (and (eq :GET (getf env :request-method))
+                  (ppcre:scan "text/html" (gethash "accept" (getf env :headers))))
+         (lack/middleware/redis:with-redis (:page-visits)
+           (red:incr "hits")))
+       (funcall app env)))
    (:user :current (lambda (env)
                      (todo-app/user:current-user env)))
    (:backtrace

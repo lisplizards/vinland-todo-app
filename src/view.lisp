@@ -49,8 +49,9 @@
              ,@body)
        (todo-app/component:site-footer)))))
 
-(defun about ()
-  (declare (optimize (speed 3) (safety 0) (debug 0)))
+(defun about (&key (page-hits 0))
+  (declare (optimize (speed 3) (safety 0) (debug 0))
+           (type integer page-hits))
   (with-main-layout
       (:title "About"
        :main-container-class "center")
@@ -58,6 +59,7 @@
      (:h1 "About")
      (:p (:em "To Do app")
          " is a demonstration of the Vinland web framework."))
+    (:p (format nil "Total page hits: ~D" page-hits))
     (:img :src "/images/lisp-lizard-with-text.svg" :alt "Lisp Lizard")))
 
 (defun 🧐 ()

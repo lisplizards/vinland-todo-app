@@ -24,8 +24,10 @@ there is a current session, otherwise redirects to the sign-in page")
   :before (list #'cache-control)
   :GET (lambda ()
          (declare (optimize (speed 3) (safety 0) (debug 0)))
-         (render :headers '(:content-type "text/html")
-                 :view #'todo-app/view:about))
+         (with-redis (:page-visits)
+           (render :headers '(:content-type "text/html")
+                   :view #'todo-app/view:about
+                   :args `(:page-hits ,(or (red:get "hits") 0)))))
   :documentation "About the To Do demo application")
 
 (export 'hello-world)

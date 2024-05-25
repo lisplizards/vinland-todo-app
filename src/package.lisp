@@ -110,8 +110,7 @@
   (:import-from #:foo.lisp.vinland/web
                 #:halt
                 #:redirect)
-  (:export #:todo-app/user
-           #:current-user
+  (:export #:current-user
            #:require-login
            #:require-no-login
            #:redirect-to-sign-in)
@@ -126,6 +125,8 @@
                 #:hash)
   (:import-from #:lack/middleware/user
                 #:*current-user*)
+  (:import-from #:lack/middleware/redis
+                #:with-redis)
   (:import-from #:foo.lisp.flash
                 #:clear-flash
                 #:get-flash
@@ -194,13 +195,13 @@
                 #:get-nested-param
                 #:collect-params
                 #:collect-nested-params)
-  (:documentation "Defines generic function specializations used to validate requests"))
+  (:documentation "Defines generic function specializations used to validate request parameters"))
 
 (defpackage #:todo-app/web
   (:use #:cl #:todo-app/controller)
   (:export #:*router*
            #:*web*)
-  (:documentation "Exports special variables for the app router and the unwrapped Clack application"))
+  (:documentation "Exports special variables required to start the application"))
 
 (defpackage #:todo-app/app
   (:use #:cl)

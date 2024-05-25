@@ -20,6 +20,10 @@ Technologies:
 * Framework: [vinland](https://github.com/lisplizards/vinland)
 * JavaScript libraries: Hotwire [Turbo](https://github.com/hotwired/turbo) and [Stimulus](https://github.com/hotwired/stimulus), [Shoelace](https://shoelace.style/) web components
 
+## Known issues
+
+Rucksack does not compile on ECL.
+
 ## Installation
 
 Not in Quicklisp, so clone the repository to "local-projects/".
@@ -43,6 +47,43 @@ The binary is written to "./bin/todo-app".
 ```sh
 ./bin/todo-app start -p 8080 -a 0.0.0.0 -w 4
 ```
+
+### Dependencies
+
+* [cl-bcrypt](https://github.com/dnaeon/cl-bcrypt)
+* [cl-hash-util](https://github.com/orthecreedence/cl-hash-util)
+* [clingon](https://github.com/dnaeon/clingon)
+* [com.inuoe.jzon](https://github.com/Zulu-Inuoe/jzon)
+* [foo.lisp.lack-middleware-charset](https://github.com/lisplizards/lack-middleware-charset)
+* [foo.lisp.lack-middleware-head](https://github.com/lisplizards/lack-middleware-head)
+* [foo.lisp.lack-middleware-http-methods](https://github.com/lisplizards/lack-middleware-http-methods)
+* [foo.lisp.lack-middleware-redis](https://github.com/lisplizards/lack-middleware-redis)
+* [foo.lisp.lack-middleware-request-id](https://github.com/lisplizards/lack-middleware-request-id)
+* [foo.lisp.lack-middleware-security-headers](https://github.com/lisplizards/lack-middleware-security-headers)
+* [foo.lisp.lack-middleware-user](https://github.com/lisplizards/lack-middleware-user)
+* [foo.lisp.lack-session-store-redis-pool](https://github.com/lisplizards/lack-session-store-redis-pool)
+* [foo.lisp.vinland](https://github.com/lisplizards/vinland)
+* [frugal-uuid](https://github.com/ak-coram/cl-frugal-uuid)
+* [lack-middleware-backtrace](https://github.com/fukamachi/lack/blob/master/lack-middleware-backtrace.asd)
+* [lack-middleware-session](https://github.com/fukamachi/lack/blob/master/lack-middleware-session.asd)
+* [lack-middleware-static](https://github.com/fukamachi/lack/blob/master/lack-middleware-static.asd)
+* [lack](https://github.com/fukamachi/lack/blob/master/lack.asd)
+* [local-time](https://github.com/dlowe-net/local-time)
+* [rucksack](https://gitlab.common-lisp.net/rucksack/rucksack)
+* [rove](https://github.com/fukamachi/rove)
+* [spinneret](https://github.com/ruricolist/spinneret)
+* [safety-params](https://github.com/fukamachi/safety-params)
+* [woo](https://github.com/fukamachi/woo)
+
+### JavaScript
+
+* [Turbo](https://github.com/hotwired/turbo)
+* [Stimulus](https://github.com/hotwired/stimulus)
+* [Shoelace](https://shoelace.style/)
+
+### Tests
+
+* [rove](https://github.com/fukamachi/rove)
 
 ## Contributing
 

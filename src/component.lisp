@@ -61,7 +61,7 @@
       (:input :type "hidden"
               :class "hidden"
               :autocomplete "off"
-              :name lack.middleware.csrf::*csrf-middleware-token*
+              :name lack/middleware/csrf::*csrf-middleware-token*
               :value (foo.lisp.vinland/web:csrf-token))))
 
 (defun site-header ()
