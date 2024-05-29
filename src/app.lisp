@@ -16,8 +16,7 @@
     :referrer-policy "strict-origin-when-cross-origin"
     :content-security-policy "default-src 'self' data: https://cdn.jsdelivr.net/; script-src 'self' https://cdn.jsdelivr.net/ 'unsafe-inline'; img-src 'self' https://cdn.jsdelivr.net/; style-src 'self' https://cdn.jsdelivr.net/ 'unsafe-inline'; font-src 'self' https://cdn.jsdelivr.net/"
     :permissions-policy "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), execution-while-out-of-viewport=(), fullscreen=(), gamepad=(), geolocation=(self), gyroscope=(), hid=(), identity-credentials-get=(), idle-detection=(), local-fonts=(), magnetometer=(), microphone=(), midi=(), otp-credentials=(self), payment=(self), picture-in-picture=(), publickey-credentials-create=(), screen-wake-lock=(), serial=(), speaker-selection=(), storage-access=(), usb=(), web-share=(), window-management=(), xr-spatial-tracking=()")
-   (:charset :default '(("text/html" . "utf-8")
-                        ("application/json" . "utf-8")))
+   (:charset :default '(("text/html" . "utf-8")))
    (:static :path (lambda (path)
                     (if (ppcre:scan "^(?:/images/|/css/|/js/|.png$|/robot\\.txt$|/favicon\\.ico$)" path)
                         path
@@ -61,7 +60,7 @@
        (when (and (eq :GET (getf env :request-method))
                   (ppcre:scan "text/html" (gethash "accept" (getf env :headers))))
          (lack/middleware/redis:with-redis (:page-visits)
-           (red:incr "hits")))
+           (red:incr "vinland-todo-app:hits")))
        (funcall app env)))
    (:user :current (lambda (env)
                      (todo-app/user:current-user env)))

@@ -3,22 +3,23 @@
 
 (in-package #:todo-app/controller)
 
+(make-hash:install-hash-reader ())
+
 (defun cache-control ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
   (set-response-headers :cache-control "private, no-store, must-revalidate"))
 
 (define-controller 'root
-  :export t
   :method '(:HEAD :GET :OPTIONS)
   :before  (list #'cache-control #'require-no-login)
   :GET (lambda ()
          (declare (optimize (speed 3) (safety 0) (debug 0)))
          (redirect "/login"))
+  :export t
   :documentation "The root resource redirects to the current user's lists collection resource when
 there is a current session, otherwise redirects to the sign-in page")
 
 (define-controller 'about
-  :export t
   :method '(:HEAD :GET :OPTIONS)
   :provide "text/html"
   :before (list #'cache-control)
@@ -27,7 +28,8 @@ there is a current session, otherwise redirects to the sign-in page")
          (with-redis (:page-visits)
            (render :headers '(:content-type "text/html")
                    :view #'todo-app/view:about
-                   :args `(:page-hits ,(or (red:get "hits") 0)))))
+                   :args (list :page-hits (or (red:get "vinland-todo-app:hits") 0)))))
+  :export t
   :documentation "About the To Do demo application")
 
 (export 'hello-world)
@@ -41,7 +43,6 @@ there is a current session, otherwise redirects to the sign-in page")
     ("Hello, World.")))
 
 (define-controller '🧐
-  :export t
   :method '(:HEAD :GET :OPTIONS)
   :provide "text/html"
   :before (list #'cache-control)
@@ -49,10 +50,10 @@ there is a current session, otherwise redirects to the sign-in page")
          (declare (optimize (speed 3) (safety 0) (debug 0)))
          (render :headers '(:content-type "text/html")
                  :view #'todo-app/view:🧐))
+  :export t
   :documentation "Emoji page...")
 
 (define-controller 'register
-  :export t
   :method '(:HEAD :GET :OPTIONS)
   :provide "text/html"
   :before (list #'cache-control #'require-no-login)
@@ -60,10 +61,10 @@ there is a current session, otherwise redirects to the sign-in page")
          (declare (optimize (speed 3) (safety 0) (debug 0)))
          `(200 (:content-type "text/html")
                (,(todo-app/view:register))))
+  :export t
   :documentation "User account registration page")
 
 (define-controller 'create-registration
-  :export t
   :method '(:POST :OPTIONS)
   :accept "application/x-www-form-urlencoded"
   :before (list #'cache-control #'require-no-login)
@@ -77,7 +78,7 @@ there is a current session, otherwise redirects to the sign-in page")
                      (return
                        (render :status :unprocessable-content
                                :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:registration-failure
+                               :view #'todo-app/turbo:registration/failure
                                :args `(:username ,username)))))
               (trivia:ematch
                (validate-params (body-params))
@@ -123,10 +124,10 @@ there is a current session, otherwise redirects to the sign-in page")
                                                      (lambda (message)
                                                        (:p message))
                                                      error-messages))))))))))))
+  :export t
   :documentation "Registers a new user account")
 
 (define-controller 'login
-  :export t
   :method '(:HEAD :GET :OPTIONS)
   :provide "text/html"
   :before (list #'cache-control #'require-no-login)
@@ -134,10 +135,10 @@ there is a current session, otherwise redirects to the sign-in page")
          (declare (optimize (speed 3) (safety 0) (debug 0)))
          (set-response-headers :content-type "text/html")
          (todo-app/view:login))
+  :export t
   :documentation "Sign-in page")
 
 (define-controller 'create-login
-  :export t
   :method '(:POST :OPTIONS)
   :accept "application/x-www-form-urlencoded"
   :before (list #'cache-control #'require-no-login)
@@ -151,7 +152,7 @@ there is a current session, otherwise redirects to the sign-in page")
                      (return
                        (render :status :unprocessable-content
                                :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:login-failure
+                               :view #'todo-app/turbo:login/failure
                                :args `(:username ,username)))))
               (let ((invalid-credential-message "Username/password is invalid"))
                 (trivia:ematch
@@ -166,16 +167,16 @@ there is a current session, otherwise redirects to the sign-in page")
                                                user))
                       (fail :message invalid-credential-message))
                     (set-session-options '(:change-id t :new-session t :expire nil))
-                    (set-session :user (hash (:id (todo-app/rucksack:user-id user))
-                                             (:username username)
-                                             (:time (get-universal-time))))
+                    (set-session :user (make-hash
+                                        :initial-contents
+                                        (list :id (todo-app/rucksack:user-id user)
+                                              :username username
+                                              :time (get-universal-time))))
                     (let ((example-cookie-config (list
                                                   :value (com.inuoe.jzon:stringify
-                                                          (hash
-                                                           ("foo" "bar")
-                                                           ("baaz" (hash
-                                                                    ("quux" "foobar")))
-                                                           ("quux" '(1 2 3)))
+                                                          #{"foo" "bar"
+                                                            "baaz" #{"quux" "foobar"}
+                                                            "quux" '(1 2 3)}
                                                           :stream nil
                                                           :pretty nil)
                                                   :path "/"
@@ -215,11 +216,11 @@ there is a current session, otherwise redirects to the sign-in page")
                                                                         "password")))))
                       (fail :message (html-safe
                                       (format nil "~{<p>~A</p>~}" error-messages)))))))))))
+  :export t
   :documentation "Given a valid username-password combination, creates a user session and
 redirects to /lists")
 
 (define-controller 'create-logout
-  :export t
   :method '(:POST :OPTIONS)
   :accept "application/x-www-form-urlencoded"
   :before (list #'cache-control #'require-login)
@@ -231,10 +232,10 @@ redirects to /lists")
           (delete-cookie "_foo")
           (redirect "/login" :status 303
                              :flash '(:success "Signed out")))
+  :export t
   :documentation "Signs out the current user, clearing the session and cookies")
 
 (define-controller 'todo-lists
-  :export t
   :method '(:HEAD :GET :POST :OPTIONS)
   :accept "application/x-www-form-urlencoded"
   :provide "text/html"
@@ -258,7 +259,7 @@ redirects to /lists")
                      (return
                        (render :status :unprocessable-content
                                :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:create-todo-list-failure))))
+                               :view #'todo-app/turbo:create-todo-list/failure))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (list :title title))
@@ -272,7 +273,7 @@ redirects to /lists")
                     (negotiate
                      ("text/vnd.turbo-stream.html"
                       (render :headers '(:content-type "text/vnd.turbo-stream.html")
-                              :view #'todo-app/turbo:create-todo-list-success
+                              :view #'todo-app/turbo:create-todo-list/success
                               :args `(:todo-lists ,todo-lists)))))
                    ((list :error (list :condition _))
                     (fail :message "Failed to query lists"))))
@@ -289,6 +290,7 @@ redirects to /lists")
                                          missing-keys)))
                 (when invalid-keys
                   (fail :message (get-param invalid-keys "title"))))))))
+  :export t
   :documentation "To Do lists collection resource")
 
 (defun find-todo-list ()
@@ -312,7 +314,6 @@ redirects to /lists")
     (client-error :not-found))))
 
 (define-controller 'todo-list
-  :export t
   :method '(:HEAD :GET :DELETE :OPTIONS)
   :provide "text/html"
   :before (list #'cache-control #'require-login)
@@ -339,17 +340,17 @@ redirects to /lists")
                  ("text/vnd.turbo-stream.html"
                   (flash-now :success "List deleted")
                   (render :headers '(:content-type "text/vnd.turbo-stream.html")
-                          :view #'todo-app/turbo:delete-todo-list-success
+                          :view #'todo-app/turbo:delete-todo-list/success
                           :args `(:todo-list ,todo-list)))))
                ((list :error (list :condition _))
                 (flash-now :error "Failed to delete list")
                 (render :status :unprocessable-content
                         :headers '(:content-type "text/vnd.turbo-stream.html")
-                        :view #'todo-app/turbo:delete-todo-list-failure))))))
+                        :view #'todo-app/turbo:delete-todo-list/failure))))))
+  :export t
   :documentation "To Do List resource")
 
 (define-controller 'todo-items
-  :export t
   :method '(:POST :OPTIONS)
   :accept "application/x-www-form-urlencoded"
   :before (list #'cache-control #'require-login)
@@ -362,7 +363,7 @@ redirects to /lists")
                      (return
                        (render :status 422
                                :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:create-todo-item-failure))))
+                               :view #'todo-app/turbo:create-todo-item/failure))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (list :content content))
@@ -377,7 +378,7 @@ redirects to /lists")
                                                   :content content)
                    ((list :ok (list :todo-item todo-item))
                     (render :headers '(:content-type "text/vnd.turbo-stream.html")
-                            :view #'todo-app/turbo:create-todo-item-success
+                            :view #'todo-app/turbo:create-todo-item/success
                             :args `(:todo-list ,todo-list
                                     :todo-item ,todo-item)))))
                  ((list :error :not-found)
@@ -393,6 +394,7 @@ redirects to /lists")
                                          missing-keys)))
                 (when invalid-keys
                   (fail :message (get-param invalid-keys "content"))))))))
+  :export t
   :documentation "To-Do items collection resource for a specific list")
 
 (defun find-todo-item ()
@@ -417,7 +419,6 @@ redirects to /lists")
     (client-error :not-found))))
 
 (define-controller 'todo-item
-  :export t
   :method '(:PATCH :DELETE :OPTIONS)
   :accept "application/json"
   :before (list #'cache-control #'require-login)
@@ -430,7 +431,7 @@ redirects to /lists")
                       (return
                         (render :status :unprocessable-content
                                 :headers '(:content-type "text/vnd.turbo-stream.html")
-                                :view #'todo-app/turbo:update-todo-item-failure))))
+                                :view #'todo-app/turbo:update-todo-item/failure))))
                (trivia:ematch
                 (find-todo-item)
                 ((trivia:plist :todo-list _ :todo-item todo-item)
@@ -445,7 +446,7 @@ redirects to /lists")
                    (flash-now :success "Task updated")
                    (render :status :ok
                            :headers '(:content-type "text/vnd.turbo-stream.html")
-                           :view #'todo-app/turbo:update-todo-item-success
+                           :view #'todo-app/turbo:update-todo-item/success
                            :args `(:todo-item ,todo-item)))
                   ((list :error (list :validation (trivia:plist
                                                    :unpermitted-keys unpermitted-keys
@@ -472,11 +473,12 @@ redirects to /lists")
                (:ok
                 (flash-now :success "Task deleted")
                 (render :headers '(:content-type "text/vnd.turbo-stream.html")
-                        :view #'todo-app/turbo:delete-todo-item-success
+                        :view #'todo-app/turbo:delete-todo-item/success
                         :args `(:todo-item ,todo-item)))
                ((list :error (list :condition _))
                 (flash-now :error "Failed to delete task")
                 (render :status :unprocessable-content
                         :headers '(:content-type "text/vnd.turbo-stream.html")
-                        :view #'todo-app/turbo:delete-todo-item-failure))))))
+                        :view #'todo-app/turbo:delete-todo-item/failure))))))
+  :export t
   :documentation "To Do item resource; a single task in a To Do list")

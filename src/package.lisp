@@ -73,9 +73,16 @@
            #:todo-item)
   (:documentation "Exports functions used to build HTML views"))
 
+(defpackage #:todo-app/layout
+  (:use #:cl)
+  (:export #:with-main-layout)
+  (:documentation "Exports layout macros called from view functions"))
+
 (defpackage #:todo-app/view
   (:local-nicknames (#:flash #:foo.lisp.flash))
   (:use #:cl)
+  (:import-from #:todo-app/layout
+                #:with-main-layout)
   (:export #:about
            #:🧐
            #:login
@@ -86,20 +93,20 @@
 
 (defpackage #:todo-app/turbo
   (:use #:cl)
-  (:export #:registration-failure
-           #:registration-success
-           #:login-failure
-           #:login-success
-           #:create-todo-list-success
-           #:create-todo-list-failure
-           #:delete-todo-list-success
-           #:delete-todo-list-failure
-           #:create-todo-item-success
-           #:create-todo-item-failure
-           #:update-todo-item-success
-           #:update-todo-item-failure
-           #:delete-todo-item-success
-           #:delete-todo-item-failure)
+  (:export #:registration/failure
+           #:registration/success
+           #:login/failure
+           #:login/success
+           #:create-todo-list/success
+           #:create-todo-list/failure
+           #:delete-todo-list/success
+           #:delete-todo-list/failure
+           #:create-todo-item/success
+           #:create-todo-item/failure
+           #:update-todo-item/success
+           #:update-todo-item/failure
+           #:delete-todo-item/success
+           #:delete-todo-item/failure)
   (:documentation "Exports functions that return application/vnd.turbo-stream.html response body strings"))
 
 (defpackage #:todo-app/user
@@ -121,8 +128,8 @@
                     (#:flash #:foo.lisp.flash)
                     (#:store #:todo-app/store))
   (:use #:cl)
-  (:import-from #:cl-hash-util
-                #:hash)
+  (:import-from #:make-hash
+                #:make-hash)
   (:import-from #:lack/middleware/user
                 #:*current-user*)
   (:import-from #:lack/middleware/redis

@@ -3,7 +3,7 @@
 
 (in-package #:todo-app/turbo)
 
-(defun registration-failure (&key username)
+(defun registration/failure (&key username)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type (or null string) username))
   (spinneret:with-html-string
@@ -14,7 +14,7 @@
       (todo-app/component:registration-form-box
        :username username)))))
 
-(defun login-failure (&key username)
+(defun login/failure (&key username)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type (or null string) username))
   (spinneret:with-html-string
@@ -25,7 +25,7 @@
       (todo-app/component:login-form-box
        :username username)))))
 
-(defun create-todo-list-success (&key todo-lists)
+(defun create-todo-list/success (&key todo-lists)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type list todo-lists))
   (spinneret:with-html-string
@@ -42,7 +42,7 @@
       (todo-app/component:new-todo-list-form
        :title nil)))))
 
-(defun create-todo-list-failure ()
+(defun create-todo-list/failure ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
   (spinneret:with-html-string
     (:turbo-stream
@@ -52,7 +52,7 @@
       (todo-app/component:new-todo-list-form
        :title nil)))))
 
-(defun delete-todo-list-success (&key todo-list)
+(defun delete-todo-list/success (&key todo-list)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type todo-app/rucksack:todo-list todo-list))
   (spinneret:with-html-string
@@ -65,7 +65,7 @@
      (:template
       (todo-app/component:flash-container)))))
 
-(defun delete-todo-list-failure ()
+(defun delete-todo-list/failure ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
   (spinneret:with-html-string
     (:turbo-stream
@@ -74,7 +74,7 @@
      (:template
       (todo-app/component:flash-container)))))
 
-(defun create-todo-item-success (&key todo-list todo-item)
+(defun create-todo-item/success (&key todo-list todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type todo-app/rucksack:todo-list todo-list)
            (type todo-app/rucksack:todo-item todo-item))
@@ -92,7 +92,7 @@
       (todo-app/component:todo-item
        :todo-item todo-item)))))
 
-(defun create-todo-item-failure ()
+(defun create-todo-item/failure ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
   (spinneret:with-html-string
     (:turbo-stream
@@ -106,7 +106,7 @@
      (:template
       (todo-app/component:flash-container)))))
 
-(defun update-todo-item-success (&key todo-item)
+(defun update-todo-item/success (&key todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type todo-app/rucksack:todo-item todo-item))
   (spinneret:with-html-string
@@ -122,7 +122,7 @@
       (todo-app/component:todo-item
        :todo-item todo-item)))))
 
-(defun update-todo-item-failure ()
+(defun update-todo-item/failure ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
   (spinneret:with-html-string
       (:turbo-stream
@@ -131,7 +131,7 @@
        (:template
         (todo-app/component:flash-container)))))
 
-(defun delete-todo-item-success (&key todo-item)
+(defun delete-todo-item/success (&key todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type todo-app/rucksack:todo-item todo-item))
   (spinneret:with-html-string
@@ -144,7 +144,7 @@
      :action "remove"
      :target (foo.lisp.resource:dom-id todo-item))))
 
-(defun delete-todo-item-failure ()
+(defun delete-todo-item/failure ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
   (spinneret:with-html-string
     (:turbo-stream

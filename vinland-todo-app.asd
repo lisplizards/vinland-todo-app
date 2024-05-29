@@ -12,7 +12,6 @@
   :bug-tracker "https://github.com/lisplizards/vinland-todo-app/issues"
   :source-control (:git "https://github.com/lisplizards/vinland-todo-app.git")
   :depends-on ("cl-bcrypt"
-               "cl-hash-util"
                "clingon"
                "com.inuoe.jzon"
                "foo.lisp.lack-middleware-charset"
@@ -22,6 +21,7 @@
                "foo.lisp.lack-middleware-request-id"
                "foo.lisp.lack-middleware-security-headers"
                "foo.lisp.lack-middleware-user"
+               "foo.lisp.lack-session-store-redis-pool"
                "foo.lisp.vinland"
                "frugal-uuid"
                "lack-middleware-backtrace"
@@ -29,9 +29,11 @@
                "lack-middleware-static"
                "lack"
                "local-time"
+               "make-hash"
                "rucksack"
-               "spinneret"
                "safety-params"
+               "spinneret"
+               "trivia"
                "woo")
   :components ((:module "src"
                 :components
@@ -40,10 +42,11 @@
                  (:file "web" :depends-on ("config" "controller" "params"))
                  (:file "params" :depends-on ("package" "controller"))
                  (:file "controller" :depends-on ("store" "user" "view" "turbo"))
-                 (:file "user" :depends-on ("store" "package"))
+                 (:file "user" :depends-on ("store"))
                  (:file "store" :depends-on ("config" "rucksack"))
-                 (:file "view" :depends-on ("component" "rucksack"))
+                 (:file "view" :depends-on ("component" "layout" "rucksack"))
                  (:file "turbo" :depends-on ("component"))
+                 (:file "layout" :depends-on ("component"))
                  (:file "component" :depends-on ("config" "rucksack"))
                  (:file "rucksack" :depends-on ("config"))
                  (:file "config" :depends-on ("package"))

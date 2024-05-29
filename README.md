@@ -51,7 +51,6 @@ The binary is written to "./bin/todo-app".
 ### Dependencies
 
 * [cl-bcrypt](https://github.com/dnaeon/cl-bcrypt)
-* [cl-hash-util](https://github.com/orthecreedence/cl-hash-util)
 * [clingon](https://github.com/dnaeon/clingon)
 * [com.inuoe.jzon](https://github.com/Zulu-Inuoe/jzon)
 * [foo.lisp.lack-middleware-charset](https://github.com/lisplizards/lack-middleware-charset)
@@ -69,10 +68,12 @@ The binary is written to "./bin/todo-app".
 * [lack-middleware-static](https://github.com/fukamachi/lack/blob/master/lack-middleware-static.asd)
 * [lack](https://github.com/fukamachi/lack/blob/master/lack.asd)
 * [local-time](https://github.com/dlowe-net/local-time)
+* [make-hash](https://github.com/genovese/make-hash)
 * [rucksack](https://gitlab.common-lisp.net/rucksack/rucksack)
 * [rove](https://github.com/fukamachi/rove)
 * [spinneret](https://github.com/ruricolist/spinneret)
 * [safety-params](https://github.com/fukamachi/safety-params)
+* [trivia](https://github.com/guicho271828/trivia)
 * [woo](https://github.com/fukamachi/woo)
 
 ### JavaScript
