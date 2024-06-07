@@ -5,13 +5,14 @@
   (:use #:cl)
   (:export #:*system-directory*
            #:*static-directory*
+           #:*static-errors-directory*
            #:*rucksack-directory*
            #:*bcrypt-cost*
            #:*minimum-password-size*
            #:*bcrypt-algorithm-identifier*)
-  (:documentation "Exports configuration-related special variables"))
+  (:documentation "Package containing configuration-related special variables."))
 
-(defpackage #:todo-app/rucksack
+(defpackage #:todo-app/dao
   (:use #:cl)
   (:export #:user
            #:todo-list
@@ -32,7 +33,7 @@
   (:documentation "Rucksack persistent class definitions"))
 
 (defpackage #:todo-app/store
-  (:use #:cl #:todo-app/rucksack)
+  (:use #:cl #:todo-app/dao)
   (:export #:make-user
            #:list-users
            #:find-user-by-id
@@ -47,7 +48,7 @@
            #:delete-todo-item
            #:update-todo-item-complete
            #:update-todo-item-incomplete)
-  (:documentation "Exports functions for all Rucksack persistence operations"))
+  (:documentation "Package containing Rucksack persistence related functions."))
 
 (defpackage #:todo-app/component
   (:local-nicknames (#:vinland #:foo.lisp.vinland)
@@ -71,12 +72,24 @@
            #:todo-list
            #:new-todo-item-form
            #:todo-item)
-  (:documentation "Exports functions used to build HTML views"))
+  (:documentation "Package containing building-block functions to compose HTML views."))
 
 (defpackage #:todo-app/layout
   (:use #:cl)
   (:export #:with-main-layout)
-  (:documentation "Exports layout macros called from view functions"))
+  (:documentation "Package containing HTML layout macros called from view functions."))
+
+(defpackage #:todo-app/http-error
+  (:use #:cl)
+  (:import-from #:todo-app/config
+                #:*static-errors-directory*)
+  (:import-from #:todo-app/layout
+                #:with-main-layout)
+  (:export #:*static-file-types*
+           #:*required-handlers*
+           #:*http-errors*)
+  (:export #:generate-static)
+  (:documentation "Package containing functions used to render HTTP error responses."))
 
 (defpackage #:todo-app/view
   (:local-nicknames (#:flash #:foo.lisp.flash))
@@ -89,7 +102,7 @@
            #:register
            #:todo-lists
            #:todo-list)
-  (:documentation "Exports functions that return text/html documents; views are composed of components"))
+  (:documentation "Package containing functions to render complete HTML documents (Content-Type: text/html)."))
 
 (defpackage #:todo-app/turbo
   (:use #:cl)
@@ -107,7 +120,7 @@
            #:update-todo-item/failure
            #:delete-todo-item/success
            #:delete-todo-item/failure)
-  (:documentation "Exports functions that return application/vnd.turbo-stream.html response body strings"))
+  (:documentation "Package containing functions to render Hotwire Turbo documents (Content-Type: text/vnd.turbo-stream.html)."))
 
 (defpackage #:todo-app/user
   (:local-nicknames (#:vinland #:foo.lisp.vinland))
@@ -121,7 +134,7 @@
            #:require-login
            #:require-no-login
            #:redirect-to-sign-in)
-  (:documentation "Exports session-related functions"))
+  (:documentation "Package containing functions related to user sessions"))
 
 (defpackage #:todo-app/controller
   (:local-nicknames (#:vinland #:foo.lisp.vinland)
@@ -142,6 +155,13 @@
                 #:flash-keep
                 #:delete-flash
                 #:sweep-flash)
+  (:import-from #:foo.lisp.resource
+                #:path)
+  (:import-from #:foo.lisp.http-response
+                #:client-error
+                #:server-error
+                #:status-code
+                #:status-code-error)
   (:import-from #:foo.lisp.params
                 #:get-param
                 #:get-nested-param
@@ -153,8 +173,6 @@
                 #:define-controller)
   (:import-from #:foo.lisp.vinland/web
                 #:halt
-                #:client-error
-                #:server-error
                 #:binding
                 #:body-params
                 #:query-params
@@ -182,7 +200,7 @@
                 #:require-login
                 #:require-no-login
                 #:redirect-to-sign-in)
-  (:documentation "Exports route symbols referenced by the router"))
+  (:documentation "Package containing controllers."))
 
 (defpackage #:todo-app/params
   (:use #:cl)
@@ -202,20 +220,20 @@
                 #:get-nested-param
                 #:collect-params
                 #:collect-nested-params)
-  (:documentation "Defines generic function specializations used to validate request parameters"))
+  (:documentation "Package containing generic functions used to validate request query or body parameters."))
 
 (defpackage #:todo-app/web
   (:use #:cl #:todo-app/controller)
   (:export #:*router*
            #:*web*)
-  (:documentation "Exports special variables required to start the application"))
+  (:documentation "Package containing special variables required to start the application."))
 
 (defpackage #:todo-app/app
   (:use #:cl)
   (:export #:*app*)
-  (:documentation "Configures middleware using LACK:BUILDER and exports *APP*, the Clack application wrapped in middleware"))
+  (:documentation "Package containing *APP*, the Clack application *WEB* wrapped in a middleware pipeline."))
 
 (defpackage #:todo-app/cli
   (:use #:cl)
   (:export #:main)
-  (:documentation "Program entrypoint"))
+  (:documentation "Program entrypoint package."))

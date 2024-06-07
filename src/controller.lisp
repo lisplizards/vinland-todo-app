@@ -19,6 +19,22 @@
   :documentation "The root resource redirects to the current user's lists collection resource when
 there is a current session, otherwise redirects to the sign-in page")
 
+(define-controller 'error/server
+  :method '(:HEAD :GET :OPTIONS)
+  :GET (lambda ()
+         (server-error 503))
+  :export t
+  :documentation "Signals a SERVER-ERROR, which is handled by the simple subprotocol to return an
+error response list.")
+
+(define-controller 'error/simple
+  :method '(:HEAD :GET :OPTIONS)
+  :GET (lambda ()
+         (error "To err is human, to handle divine"))
+  :export t
+  :documentation "Signals an ERROR, which is not handled by the simple subprotocol but instead
+handled entirely by the overshield middleware")
+
 (define-controller 'about
   :method '(:HEAD :GET :OPTIONS)
   :provide "text/html"
@@ -28,7 +44,8 @@ there is a current session, otherwise redirects to the sign-in page")
          (with-redis (:page-visits)
            (render :headers '(:content-type "text/html")
                    :view #'todo-app/view:about
-                   :args (list :page-hits (or (red:get "vinland-todo-app:hits") 0)))))
+                   :args (list :page-hits (or (red:get "vinland-todo-app:hits")
+                                              0)))))
   :export t
   :documentation "About the To Do demo application")
 
@@ -74,12 +91,16 @@ there is a current session, otherwise redirects to the sign-in page")
             (flet ((fail (&key message username)
                      (declare (type (or html-safe string) message)
                               (type (or null string) username))
-                     (flash-now :error message)
                      (return
-                       (render :status :unprocessable-content
-                               :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:registration/failure
-                               :args `(:username ,username)))))
+                       (negotiate
+                        ("text/vnd.turbo-stream.html"
+                         (flash-now :error message)
+                         (render :status :unprocessable-content
+                                 :headers '(:content-type "text/vnd.turbo-stream.html")
+                                 :view #'todo-app/turbo:registration/failure
+                                 :args `(:username ,username)))
+                        ("text/html"
+                         (redirect "/register" `(:error ,message)))))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (trivia:plist :username username
@@ -148,12 +169,16 @@ there is a current session, otherwise redirects to the sign-in page")
             (flet ((fail (&key message username)
                      (declare (type (or html-safe string) message)
                               (type (or null string) username))
-                     (flash-now :error message)
                      (return
-                       (render :status :unprocessable-content
-                               :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:login/failure
-                               :args `(:username ,username)))))
+                       (negotiate
+                        ("text/vnd.turbo-stream.html"
+                         (flash-now :error message)
+                         (render :status :unprocessable-content
+                                 :headers '(:content-type "text/vnd.turbo-stream.html")
+                                 :view #'todo-app/turbo:login/failure
+                                 :args `(:username ,username)))
+                        ("text/html"
+                         (redirect "/login" :flash `(:error ,message)))))))
               (let ((invalid-credential-message "Username/password is invalid"))
                 (trivia:ematch
                  (validate-params (body-params))
@@ -163,20 +188,20 @@ there is a current session, otherwise redirects to the sign-in page")
                    (todo-app/store:find-user-by-username username)
                    ((list :ok (list :user user))
                     (unless (bcrypt:password= password
-                                              (todo-app/rucksack:hashed-password
+                                              (todo-app/dao:hashed-password
                                                user))
                       (fail :message invalid-credential-message))
                     (set-session-options '(:change-id t :new-session t :expire nil))
                     (set-session :user (make-hash
                                         :initial-contents
-                                        (list :id (todo-app/rucksack:user-id user)
+                                        (list :id (todo-app/dao:user-id user)
                                               :username username
                                               :time (get-universal-time))))
                     (let ((example-cookie-config (list
                                                   :value (com.inuoe.jzon:stringify
                                                           #{"foo" "bar"
-                                                            "baaz" #{"quux" "foobar"}
-                                                            "quux" '(1 2 3)}
+                                                          "baaz" #{"quux" "foobar"}
+                                                          "quux" (1 2 3)}
                                                           :stream nil
                                                           :pretty nil)
                                                   :path "/"
@@ -197,7 +222,7 @@ there is a current session, otherwise redirects to the sign-in page")
                               :status 303
                               :flash '(:success "Sign-in successful")))
                    ((list :error :not-found)
-                    ;; Simulate time it takes to run bcrypt iterations.
+                    ;; Naively simulate time it takes to run bcrypt iterations.
                     (sleep 0.2)
                     (fail :message invalid-credential-message))))
                  ((list :error (list :validation
@@ -255,11 +280,15 @@ redirects to /lists")
           (block nil
             (flet ((fail (&key message)
                      (declare (type (or html-safe string) message))
-                     (flash-now :error message)
                      (return
-                       (render :status :unprocessable-content
-                               :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:create-todo-list/failure))))
+                       (negotiate
+                        ("text/vnd.turbo-stream.html"
+                         (flash-now :error message)
+                         (render :status :unprocessable-content
+                                 :headers '(:content-type "text/vnd.turbo-stream.html")
+                                 :view #'todo-app/turbo:create-todo-list/failure))
+                        ("text/html"
+                         (redirect "/lists" :flash `(:error ,message)))))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (list :title title))
@@ -274,7 +303,9 @@ redirects to /lists")
                      ("text/vnd.turbo-stream.html"
                       (render :headers '(:content-type "text/vnd.turbo-stream.html")
                               :view #'todo-app/turbo:create-todo-list/success
-                              :args `(:todo-lists ,todo-lists)))))
+                              :args `(:todo-lists ,todo-lists)))
+                     ("text/html"
+                      (redirect "/lists" :flash '(:success "List created")))))
                    ((list :error (list :condition _))
                     (fail :message "Failed to query lists"))))
                  ((list :error (list :condition _))
@@ -298,9 +329,9 @@ redirects to /lists")
   (trivia:ematch
    (todo-app/store:find-todo-list-by-id (binding :|todo-list|))
    ((list :ok (list :todo-list todo-list))
-    (declare (type todo-app/rucksack:todo-list todo-list))
-    (unless (equal (todo-app/rucksack:user-id *current-user*)
-                   (todo-app/rucksack:user-id todo-list))
+    (declare (type todo-app/dao:todo-list todo-list))
+    (unless (equal (todo-app/dao:user-id *current-user*)
+                   (todo-app/dao:user-id todo-list))
       (client-error :forbidden))
     (trivia:ematch
      (todo-app/store:list-todo-items :todo-list todo-list)
@@ -322,7 +353,7 @@ redirects to /lists")
          (trivia:ematch
           (find-todo-list)
           ((trivia:plist :todo-list todo-list :todo-items todo-items)
-           (declare (type todo-app/rucksack:todo-list todo-list)
+           (declare (type todo-app/dao:todo-list todo-list)
                     (type list todo-items))
            (render :headers '(:content-type "text/html")
                    :view #'todo-app/view:todo-list
@@ -331,22 +362,33 @@ redirects to /lists")
             (declare (optimize (speed 3) (safety 0) (debug 0)))
             (trivia:ematch
              (find-todo-list)
-             ((trivia:plist :todo-list todo-list :todo-items _)
+             ((trivia:plist :todo-list todo-list :todo-items todo-items)
               (trivia:ematch
                (todo-app/store:delete-todo-list :todo-list todo-list)
                (:ok
-                (declare (type todo-app/rucksack:todo-list todo-list))
+                (declare (type todo-app/dao:todo-list todo-list))
                 (negotiate
                  ("text/vnd.turbo-stream.html"
                   (flash-now :success "List deleted")
                   (render :headers '(:content-type "text/vnd.turbo-stream.html")
                           :view #'todo-app/turbo:delete-todo-list/success
-                          :args `(:todo-list ,todo-list)))))
+                          :args `(:todo-list ,todo-list)))
+                 ("text/html"
+                  (flash :success "List deleted")
+                  (redirect "/lists"))))
                ((list :error (list :condition _))
-                (flash-now :error "Failed to delete list")
-                (render :status :unprocessable-content
-                        :headers '(:content-type "text/vnd.turbo-stream.html")
-                        :view #'todo-app/turbo:delete-todo-list/failure))))))
+                (negotiate
+                 ("text/vnd.turbo-stream.html"
+                  (flash-now :error "Failed to delete list")
+                  (render :status :unprocessable-content
+                          :headers '(:content-type "text/vnd.turbo-stream.html")
+                          :view #'todo-app/turbo:delete-todo-list/failure))
+                 ("text/html"
+                  (flash-now :error "Failed to delete list")
+                  (render :status :unprocessable-content
+                          :headers '(:content-type "text/html")
+                          :view #'todo-app/view:todo-list
+                          :args `(:todo-list ,todo-list :todo-items ,todo-items)))))))))
   :export t
   :documentation "To Do List resource")
 
@@ -357,43 +399,57 @@ redirects to /lists")
   :POST (lambda ()
           (declare (optimize (speed 3) (safety 0) (debug 0)))
           (block nil
-            (flet ((fail (&key message)
-                     (declare (type string message))
-                     (flash-now :error message)
+            (flet ((fail (&key todo-list message)
+                     (declare (type todo-app/dao:todo-list todo-list)
+                              (type string message))
                      (return
-                       (render :status 422
-                               :headers '(:content-type "text/vnd.turbo-stream.html")
-                               :view #'todo-app/turbo:create-todo-item/failure))))
+                       (negotiate
+                        ("text/vnd.turbo-stream.html"
+                         (flash-now :error message)
+                         (render :status 422
+                                 :headers '(:content-type "text/vnd.turbo-stream.html")
+                                 :view #'todo-app/turbo:create-todo-item/failure
+                                 :args (list :todo-list todo-list)))
+                        ("text/html"
+                         (redirect (path todo-list) :flash (list :error message)))))))
               (trivia:ematch
-               (validate-params (body-params))
-               ((list :ok (list :content content))
+               (todo-app/store:find-todo-list-by-id (binding :|todo-list|))
+               ((list :ok (list :todo-list todo-list))
+                (unless (equal (slot-value *current-user* 'todo-app/dao:user-id)
+                               (slot-value todo-list 'todo-app/dao:user-id))
+                  (client-error :not-found))
                 (trivia:ematch
-                 (todo-app/store:find-todo-list-by-id (binding :|todo-list|))
-                 ((list :ok (list :todo-list todo-list))
-                  (unless (equal (slot-value *current-user* 'todo-app/rucksack:user-id)
-                                 (slot-value todo-list 'todo-app/rucksack:user-id))
-                    (client-error :not-found))
+                 (validate-params (body-params))
+                 ((list :ok (list :content content))
                   (trivia:ematch
                    (todo-app/store:make-todo-item :todo-list todo-list
                                                   :content content)
                    ((list :ok (list :todo-item todo-item))
-                    (render :headers '(:content-type "text/vnd.turbo-stream.html")
-                            :view #'todo-app/turbo:create-todo-item/success
-                            :args `(:todo-list ,todo-list
-                                    :todo-item ,todo-item)))))
-                 ((list :error :not-found)
-                  (client-error :not-found))))
-               ((list :error (list :validation (trivia:plist
-                                                :unpermitted-keys unpermitted-keys
-                                                :missing-keys missing-keys
-                                                :invalid-keys invalid-keys)))
-                (when unpermitted-keys
-                  (fail :message "Unpermitted parameters detected. Stop."))
-                (when missing-keys
-                  (fail :message (format nil "Request is missing the following parameters: ~{~A ~}"
-                                         missing-keys)))
-                (when invalid-keys
-                  (fail :message (get-param invalid-keys "content"))))))))
+                    (negotiate
+                     ("text/vnd.turbo-stream.html"
+                      (render :headers '(:content-type "text/vnd.turbo-stream.html")
+                              :view #'todo-app/turbo:create-todo-item/success
+                              :args `(:todo-list ,todo-list
+                                      :todo-item ,todo-item)))
+                     ("text/html"
+                      (redirect (path todo-list)
+                                :flash `(:success "Task created")))))))
+                 ((list :error (list :validation (trivia:plist
+                                                  :unpermitted-keys unpermitted-keys
+                                                  :missing-keys missing-keys
+                                                  :invalid-keys invalid-keys)))
+                  (when unpermitted-keys
+                    (fail :todo-list todo-list
+                          :message "Unpermitted parameters detected. Stop."))
+                  (when missing-keys
+                    (fail :todo-list todo-list
+                          :message (format nil "Request is missing the following parameters: ~{~A ~}"
+                                           missing-keys)))
+                  (when invalid-keys
+                    (fail :todo-list todo-list
+                          :message (get-param invalid-keys "content"))))))
+               ((list :error :not-found)
+                (client-error :not-found))))))
   :export t
   :documentation "To-Do items collection resource for a specific list")
 
@@ -402,14 +458,14 @@ redirects to /lists")
   (trivia:ematch
    (todo-app/store:find-todo-list-by-id (binding :|todo-list|))
    ((list :ok (list :todo-list todo-list))
-    (unless (equal (slot-value *current-user* 'todo-app/rucksack:user-id)
-                   (slot-value todo-list 'todo-app/rucksack:user-id))
+    (unless (equal (slot-value *current-user* 'todo-app/dao:user-id)
+                   (slot-value todo-list 'todo-app/dao:user-id))
       (client-error :forbidden))
     (trivia:ematch
      (todo-app/store:find-todo-item-by-id (binding :|todo-item|))
      ((list :ok (list :todo-item todo-item))
-      (unless (equal (slot-value todo-item 'todo-app/rucksack:todo-list-id)
-                     (slot-value todo-list 'todo-app/rucksack:todo-list-id))
+      (unless (equal (slot-value todo-item 'todo-app/dao:todo-list-id)
+                     (slot-value todo-list 'todo-app/dao:todo-list-id))
         (client-error :not-found))
       (list :todo-list todo-list
             :todo-item todo-item))
@@ -425,16 +481,22 @@ redirects to /lists")
   :PATCH (lambda ()
            (declare (optimize (speed 3) (safety 0) (debug 0)))
            (block nil
-             (flet ((fail (&key message)
-                      (declare (type (or html-safe string) message))
-                      (flash-now :error message)
+             (flet ((fail (&key message todo-list)
+                      (declare (type (or html-safe string) message)
+                               (type todo-app/dao:todo-list todo-list))
                       (return
-                        (render :status :unprocessable-content
-                                :headers '(:content-type "text/vnd.turbo-stream.html")
-                                :view #'todo-app/turbo:update-todo-item/failure))))
+                        (negotiate
+                         ("text/vnd.turbo-stream.html"
+                          (flash-now :error message)
+                          (render :status :unprocessable-content
+                                  :headers '(:content-type "text/vnd.turbo-stream.html")
+                                  :view #'todo-app/turbo:update-todo-item/failure))
+                         ("text/html"
+                          (redirect (path todo-list)
+                                    :flash `(:error ,message)))))))
                (trivia:ematch
                 (find-todo-item)
-                ((trivia:plist :todo-list _ :todo-item todo-item)
+                ((trivia:plist :todo-list todo-list :todo-item todo-item)
                  (trivia:ematch
                   (validate-params (body-params))
                   ((list :ok (list :completed completedp))
@@ -443,42 +505,61 @@ redirects to /lists")
                    (if completedp
                        (todo-app/store:update-todo-item-complete :todo-item todo-item)
                        (todo-app/store:update-todo-item-incomplete :todo-item todo-item))
-                   (flash-now :success "Task updated")
-                   (render :status :ok
-                           :headers '(:content-type "text/vnd.turbo-stream.html")
-                           :view #'todo-app/turbo:update-todo-item/success
-                           :args `(:todo-item ,todo-item)))
+                   (negotiate
+                    ("text/vnd.turbo-stream.html"
+                     (flash-now :success "Task updated")
+                     (render :status :ok
+                             :headers '(:content-type "text/vnd.turbo-stream.html")
+                             :view #'todo-app/turbo:update-todo-item/success
+                             :args `(:todo-item ,todo-item)))
+                    ("text/html"
+                     (redirect (path todo-list) :flash '(:success "Task updated")))))
                   ((list :error (list :validation (trivia:plist
                                                    :unpermitted-keys unpermitted-keys
                                                    :missing-keys missing-keys
                                                    :invalid-keys invalid-keys)))
                    (when unpermitted-keys
-                     (fail :message "Unpermitted parameters detected. Stop."))
+                     (fail :message "Unpermitted parameters detected. Stop."
+                           :todo-list todo-list))
                    (when missing-keys
                      (fail :message (format nil "Request is missing the following parameters: ~{~A ~}"
-                                            missing-keys)))
+                                            missing-keys)
+                           :todo-list todo-list))
                    (when invalid-keys
                      (let ((error-messages (remove nil (collect-params invalid-keys
                                                                        '("status"
                                                                          "content")))))
                        (fail :message (html-safe
-                                       (format nil "~{<p>~A</p>~}" error-messages))))))))))))
+                                       (format nil "~{<p>~A</p>~}" error-messages))
+                             :todo-list todo-list))))))))))
   :DELETE (lambda ()
             (declare (optimize (speed 3) (safety 0) (debug 0)))
             (trivia:ematch
              (find-todo-item)
-             ((trivia:plist :todo-list _ :todo-item todo-item)
+             ((trivia:plist :todo-list todo-list :todo-item todo-item)
               (trivia:ematch
                (todo-app/store:delete-todo-item :todo-item todo-item)
                (:ok
-                (flash-now :success "Task deleted")
-                (render :headers '(:content-type "text/vnd.turbo-stream.html")
-                        :view #'todo-app/turbo:delete-todo-item/success
-                        :args `(:todo-item ,todo-item)))
+                (negotiate
+                 ("text/vnd.turbo-stream.html"
+                  (flash-now :success "Task deleted")
+                  (render :headers '(:content-type "text/vnd.turbo-stream.html")
+                          :view #'todo-app/turbo:delete-todo-item/success
+                          :args `(:todo-item ,todo-item)))
+                 ("text/html"
+                  (redirect (path todo-list)
+                            :flash '(:success "Task deleted")))))
                ((list :error (list :condition _))
-                (flash-now :error "Failed to delete task")
-                (render :status :unprocessable-content
-                        :headers '(:content-type "text/vnd.turbo-stream.html")
-                        :view #'todo-app/turbo:delete-todo-item/failure))))))
+                (let ((error-message "Failed to delete task"))
+                  (declare (type string error-message))
+                  (negotiate
+                   ("text/vnd.turbo-stream.html"
+                    (flash-now :error error-message)
+                    (render :status :unprocessable-content
+                            :headers '(:content-type "text/vnd.turbo-stream.html")
+                            :view #'todo-app/turbo:delete-todo-item/failure))
+                   ("text/html"
+                    (redirect (path todo-list)
+                              :flash '(:error "Failed to delete task"))))))))))
   :export t
   :documentation "To Do item resource; a single task in a To Do list")

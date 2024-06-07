@@ -7,6 +7,8 @@
 
 (defvar *static-directory* (merge-pathnames #p"static/" *system-directory*))
 
+(defvar *static-errors-directory* (merge-pathnames #p"static/errors/" *system-directory*))
+
 (defvar *rucksack-directory* #p"/tmp/todo-app/")
 
 (defvar *bcrypt-cost* 14)

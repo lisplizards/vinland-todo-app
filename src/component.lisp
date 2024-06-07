@@ -3,6 +3,15 @@
 
 (in-package #:todo-app/component)
 
+(defun csrf-input ()
+  (declare (optimize (speed 3) (safety 0) (debug 0)))
+  (spinneret:with-html
+      (:input :type "hidden"
+              :class "hidden"
+              :autocomplete "off"
+              :name lack/middleware/csrf::*csrf-middleware-token*
+              :value (foo.lisp.vinland/web:csrf-token))))
+
 (defun flash-container (&optional (flash-types '(:notice :success :alert :error)))
   (declare (optimize (speed 3) (safety 0) (debug 0))
            (type foo.lisp.vinland/handler/types:keyword-list flash-types))
@@ -54,15 +63,6 @@
            (:sl-alert :variant "danger" :open t :closable t :duration "3000"
                       (:sl-icon :slot "icon" :name "exclamation-octagon")
                       (message)))))))
-
-(defun csrf-input ()
-  (declare (optimize (speed 3) (safety 0) (debug 0)))
-  (spinneret:with-html
-      (:input :type "hidden"
-              :class "hidden"
-              :autocomplete "off"
-              :name lack/middleware/csrf::*csrf-middleware-token*
-              :value (foo.lisp.vinland/web:csrf-token))))
 
 (defun site-header ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
@@ -246,17 +246,17 @@
 
 (defun todo-list-link-item (&key todo-list)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-list todo-list))
+           (type todo-app/dao:todo-list todo-list))
   (spinneret:with-html
       (:li :id (foo.lisp.resource:dom-id todo-list)
            (:div :class "todo-list-link-item__link-box"
                  (:p :class "todo-list-link-item__title"
-                     (todo-app/rucksack:todo-list-title todo-list))
+                     (todo-app/dao:todo-list-title todo-list))
                  (:p (:small (format nil "Created: ~A"
                                      (local-time:format-timestring
                                       nil
                                       (local-time:universal-to-timestamp
-                                       (slot-value todo-list 'todo-app/rucksack:created-at))
+                                       (slot-value todo-list 'todo-app/dao:created-at))
                                       :format local-time:+rfc-1123-format+)))))
            (:div :class "todo-list-link-item__controls"
                  (:sl-button :variant "primary"
@@ -271,7 +271,7 @@
 
 (defun new-todo-item-form (&key todo-list)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-list todo-list))
+           (type todo-app/dao:todo-list todo-list))
   (spinneret:with-html
       (:form :accept-charset "UTF-8"
              :method "POST"
@@ -285,9 +285,9 @@
 
 (defun todo-item (&key todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-item todo-item))
+           (type todo-app/dao:todo-item todo-item))
   (spinneret:with-html
-      (with-slots (todo-app/rucksack:todo-item-id todo-app/rucksack:content)
+      (with-slots (todo-app/dao:todo-item-id todo-app/dao:content)
           todo-item
         (:li :class "todo-list-item"
              :id (foo.lisp.resource:dom-id todo-item)
@@ -295,13 +295,13 @@
                     :action (foo.lisp.resource:path todo-item)
                     :class "todo-list-item-patch-form"
                     (csrf-input)
-                    (if (todo-app/rucksack:todo-item-completed-p todo-item)
+                    (if (todo-app/dao:todo-item-completed-p todo-item)
                         (:sl-checkbox :name "completed"
                                       :checked t
-                                      (:p (:s todo-app/rucksack:content)))
+                                      (:p (:s todo-app/dao:content)))
                         (:sl-checkbox :checked nil
                                       :name "completed"
-                                      (:p todo-app/rucksack:content))))
+                                      (:p todo-app/dao:content))))
              (:form :method "DELETE"
                     :action (foo.lisp.resource:path todo-item)
                     (csrf-input)

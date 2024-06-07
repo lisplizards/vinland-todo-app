@@ -1,7 +1,7 @@
 ;; Copyright (c) 2024 John Newton
 ;; SPDX-License-Identifier: Apache-2.0
 
-(in-package #:todo-app/rucksack)
+(in-package #:todo-app/dao)
 
 (rucksack:with-rucksack (rs todo-app/config:*rucksack-directory*)
   (rucksack:with-transaction ()

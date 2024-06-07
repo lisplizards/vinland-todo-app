@@ -63,19 +63,19 @@
 
 (defun todo-list (&key todo-list todo-items)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-list todo-list)
+           (type todo-app/dao:todo-list todo-list)
            (type list todo-items))
   (with-main-layout
       (:title "To Do list"
        :main-container-class "block")
     (:div :class "todo-list-box"
-          (:h1 (todo-app/rucksack:todo-list-title todo-list))
+          (:h1 (todo-app/dao:todo-list-title todo-list))
           (todo-app/component:flash-container)
           (todo-app/component:new-todo-item-form :todo-list todo-list)
           (:ul :id "todo-list-items-list"
                :data-controller "todo-list"
                (mapcar
                 #'(lambda (todo-item)
-                    (declare (type todo-app/rucksack:todo-item todo-item))
+                    (declare (type todo-app/dao:todo-item todo-item))
                     (todo-app/component:todo-item :todo-item todo-item))
                 todo-items)))))

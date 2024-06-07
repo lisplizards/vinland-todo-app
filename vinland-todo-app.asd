@@ -15,8 +15,11 @@
                "clingon"
                "com.inuoe.jzon"
                "foo.lisp.lack-middleware-charset"
+               "foo.lisp.lack-middleware-debug"
+               "foo.lisp.lack-middleware-errors"
                "foo.lisp.lack-middleware-head"
                "foo.lisp.lack-middleware-http-methods"
+               "foo.lisp.lack-middleware-redact"
                "foo.lisp.lack-middleware-redis"
                "foo.lisp.lack-middleware-request-id"
                "foo.lisp.lack-middleware-security-headers"
@@ -24,7 +27,6 @@
                "foo.lisp.lack-session-store-redis-pool"
                "foo.lisp.vinland"
                "frugal-uuid"
-               "lack-middleware-backtrace"
                "lack-middleware-session"
                "lack-middleware-static"
                "lack"
@@ -38,17 +40,18 @@
   :components ((:module "src"
                 :components
                 ((:file "cli" :depends-on ("app"))
-                 (:file "app" :depends-on ("web"))
+                 (:file "app" :depends-on ("http-error" "web"))
                  (:file "web" :depends-on ("config" "controller" "params"))
                  (:file "params" :depends-on ("package" "controller"))
                  (:file "controller" :depends-on ("store" "user" "view" "turbo"))
                  (:file "user" :depends-on ("store"))
-                 (:file "store" :depends-on ("config" "rucksack"))
-                 (:file "view" :depends-on ("component" "layout" "rucksack"))
+                 (:file "store" :depends-on ("config" "dao"))
+                 (:file "view" :depends-on ("component" "layout" "dao"))
                  (:file "turbo" :depends-on ("component"))
+                 (:file "http-error" :depends-on ("component" "layout"))
                  (:file "layout" :depends-on ("component"))
-                 (:file "component" :depends-on ("config" "rucksack"))
-                 (:file "rucksack" :depends-on ("config"))
+                 (:file "component" :depends-on ("config" "dao"))
+                 (:file "dao" :depends-on ("config"))
                  (:file "config" :depends-on ("package"))
                  (:file "package"))))
   :description "Example application for the Vinland web framework"

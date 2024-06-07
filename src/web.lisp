@@ -8,6 +8,8 @@
    `(("/" ,'root)
      ("/about" ,'about)
      ("/hello-world" ,'hello-world)
+     ("/error/server" ,'error/server)
+     ("/error/simple" ,'error/simple)
      ("/🧐" ,'🧐)
      ("/login" ,'login)
      ("/register" ,'register)

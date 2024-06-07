@@ -54,7 +54,7 @@
 
 (defun delete-todo-list/success (&key todo-list)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-list todo-list))
+           (type todo-app/dao:todo-list todo-list))
   (spinneret:with-html-string
     (:turbo-stream
      :action "remove"
@@ -76,8 +76,8 @@
 
 (defun create-todo-item/success (&key todo-list todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-list todo-list)
-           (type todo-app/rucksack:todo-item todo-item))
+           (type todo-app/dao:todo-list todo-list)
+           (type todo-app/dao:todo-item todo-item))
   (spinneret:with-html-string
     (:turbo-stream
      :action "replace"
@@ -92,14 +92,16 @@
       (todo-app/component:todo-item
        :todo-item todo-item)))))
 
-(defun create-todo-item/failure ()
-  (declare (optimize (speed 3) (safety 0) (debug 0)))
+(defun create-todo-item/failure (&key todo-list)
+  (declare (optimize (speed 3) (safety 0) (debug 0))
+           (type todo-app/dao:todo-list todo-list))
   (spinneret:with-html-string
     (:turbo-stream
      :action "replace"
      :target "new-todo-item-form"
      (:template
-      (todo-app/component:new-todo-item-form)))
+      (todo-app/component:new-todo-item-form
+       :todo-list todo-list)))
     (:turbo-stream
      :action "replace"
      :target "flash-container"
@@ -108,7 +110,7 @@
 
 (defun update-todo-item/success (&key todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-item todo-item))
+           (type todo-app/dao:todo-item todo-item))
   (spinneret:with-html-string
     (:turbo-stream
      :action "replace"
@@ -133,7 +135,7 @@
 
 (defun delete-todo-item/success (&key todo-item)
   (declare (optimize (speed 3) (safety 0) (debug 0))
-           (type todo-app/rucksack:todo-item todo-item))
+           (type todo-app/dao:todo-item todo-item))
   (spinneret:with-html-string
     (:turbo-stream
      :action "replace"

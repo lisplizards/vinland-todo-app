@@ -3,7 +3,7 @@
 
 (in-package #:todo-app/user)
 
-(declaim (ftype (function (list) (or null todo-app/rucksack:user)) current-user))
+(declaim (ftype (function (list) (or null todo-app/dao:user)) current-user))
 (defun current-user (env)
   "Loads the current user from session data; called by the *LACK-MIDDLEWARE-USER* middleware,
 which dynamically binds the result to *CURRENT-USER*."
@@ -16,7 +16,7 @@ which dynamically binds the result to *CURRENT-USER*."
       (or (gethash :id session-user-data)
           (return-from current-user)))
      ((list :ok (list :user user))
-      (declare (type todo-app/rucksack:user user))
+      (declare (type todo-app/dao:user user))
       user)
      ((list :error :not-found)
       nil))))
