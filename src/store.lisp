@@ -9,8 +9,8 @@
            (type string password))
   (rucksack:with-rucksack (rs todo-app/config:*rucksack-directory*)
     (rucksack:with-transaction ()
-      (unless (>= (length password)
-                  todo-app/config:*minimum-password-size*)
+      (unless (>= (the fixnum (length password))
+                  (the fixnum todo-app/config:*minimum-password-size*))
         (return-from make-user
           `(:error :insufficient-password-complexity)))
       (let ((bcrypt-password

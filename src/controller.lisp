@@ -14,7 +14,7 @@
   :before  (list #'cache-control #'require-no-login)
   :GET (lambda ()
          (declare (optimize (speed 3) (safety 0) (debug 0)))
-         (redirect "/login"))
+         (redirect (route-path 'login)))
   :export t
   :documentation "The root resource redirects to the current user's lists collection resource when
 there is a current session, otherwise redirects to the sign-in page")
@@ -44,8 +44,10 @@ handled entirely by the overshield middleware")
          (with-redis (:page-visits)
            (render :headers '(:content-type "text/html")
                    :view #'todo-app/view:about
-                   :args (list :page-hits (or (red:get "vinland-todo-app:hits")
-                                              0)))))
+                   :args (list :page-hits
+                               (the integer
+                                    (or (red:get "vinland-todo-app:hits")
+                                        0))))))
   :export t
   :documentation "About the To Do demo application")
 
@@ -100,7 +102,7 @@ handled entirely by the overshield middleware")
                                  :view #'todo-app/turbo:registration/failure
                                  :args `(:username ,username)))
                         ("text/html"
-                         (redirect "/register" `(:error ,message)))))))
+                         (redirect (route-path 'register) `(:error ,message)))))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (trivia:plist :username username
@@ -110,8 +112,9 @@ handled entirely by the overshield middleware")
                  (store:make-user :username username
                                   :password password)
                  ((list :ok (list :user _))
-                  (redirect "/login" :status :see-other
-                                     :flash '(:success "Account created. Please login to continue.")))
+                  (redirect (route-path 'login)
+                            :status :see-other
+                            :flash '(:success "Account created. Please login to continue.")))
                  ((list :error :insufficient-password-complexity)
                   (fail :message "Password is not sufficiently complex."
                         :username username))
@@ -178,7 +181,8 @@ handled entirely by the overshield middleware")
                                  :view #'todo-app/turbo:login/failure
                                  :args `(:username ,username)))
                         ("text/html"
-                         (redirect "/login" :flash `(:error ,message)))))))
+                         (redirect (route-path 'login)
+                                   :flash `(:error ,message)))))))
               (let ((invalid-credential-message "Username/password is invalid"))
                 (trivia:ematch
                  (validate-params (body-params))
@@ -206,7 +210,7 @@ handled entirely by the overshield middleware")
                                                           :pretty nil)
                                                   :path "/"
                                                   :domain "localhost"
-                                                  :expires (+ 1200 (get-universal-time))
+                                                  :expires 1200
                                                   :httponly t
                                                   :secure nil
                                                   :samesite :strict)))
@@ -218,7 +222,7 @@ handled entirely by the overshield middleware")
                                                 :samesite :strict)))))
                     (redirect (if (session :origin)
                                   (session :origin)
-                                  "/lists")
+                                  (route-path 'todo-lists))
                               :status 303
                               :flash '(:success "Sign-in successful")))
                    ((list :error :not-found)
@@ -255,8 +259,9 @@ redirects to /lists")
           (clear-session)
           (delete-cookie "_example")
           (delete-cookie "_foo")
-          (redirect "/login" :status 303
-                             :flash '(:success "Signed out")))
+          (redirect (route-path 'login)
+                    :status 303
+                    :flash '(:success "Signed out")))
   :export t
   :documentation "Signs out the current user, clearing the session and cookies")
 
@@ -288,7 +293,8 @@ redirects to /lists")
                                  :headers '(:content-type "text/vnd.turbo-stream.html")
                                  :view #'todo-app/turbo:create-todo-list/failure))
                         ("text/html"
-                         (redirect "/lists" :flash `(:error ,message)))))))
+                         (redirect (route-path 'todo-lists)
+                                   :flash `(:error ,message)))))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (list :title title))
@@ -305,7 +311,8 @@ redirects to /lists")
                               :view #'todo-app/turbo:create-todo-list/success
                               :args `(:todo-lists ,todo-lists)))
                      ("text/html"
-                      (redirect "/lists" :flash '(:success "List created")))))
+                      (redirect (route-path 'todo-lists)
+                                :flash '(:success "List created")))))
                    ((list :error (list :condition _))
                     (fail :message "Failed to query lists"))))
                  ((list :error (list :condition _))
@@ -375,7 +382,7 @@ redirects to /lists")
                           :args `(:todo-list ,todo-list)))
                  ("text/html"
                   (flash :success "List deleted")
-                  (redirect "/lists"))))
+                  (redirect (route-path 'todo-lists)))))
                ((list :error (list :condition _))
                 (negotiate
                  ("text/vnd.turbo-stream.html"

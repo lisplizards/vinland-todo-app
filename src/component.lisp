@@ -70,7 +70,8 @@
       (:header
        (:div :class "site-header-left"
              (:p :class "site-title"
-                 (:a :href "/" "ToDo app"))
+                 (:a :href (route-path 'root)
+                     "ToDo app"))
              (:a :class "social-link"
                  :href "https://github.com/lisplizards/vinland-todo-app"
                  :target "_blank"
@@ -78,9 +79,9 @@
                  (:img :src "/images/github-mark.svg")))
        (if *current-user*
            (:nav
-            (:sl-button :href "/lists"
+            (:sl-button :href (route-path 'todo-lists)
                         "Lists")
-            (:form :action "/action/logout"
+            (:form :action (route-path 'create-logout)
                    :method "POST"
                    :data-turbo-frame "_top"
                    (csrf-input)
@@ -88,9 +89,9 @@
                                :id "sign-out-button"
                                "Sign out")))
            (:nav
-            (:sl-button :href "/login"
+            (:sl-button :href (route-path 'login)
                         "Sign in")
-            (:sl-button :href "/register"
+            (:sl-button :href (route-path 'register)
                         "Register"))))))
 
 (defun site-footer ()
@@ -100,7 +101,7 @@
        (:div :class "copyright-container"
              (:p :class "footer-copyright" "© John Newton 2024"))
        (:nav
-        (:a :href "/about"
+        (:a :href (route-path 'about)
             "About")))))
 
 (defun session-spinner (&key message hidden)

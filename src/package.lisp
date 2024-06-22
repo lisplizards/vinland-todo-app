@@ -14,6 +14,8 @@
 
 (defpackage #:todo-app/dao
   (:use #:cl)
+  (:import-from #:foo.lisp.vinland/web
+                #:route-path)
   (:export #:user
            #:todo-list
            #:todo-item)
@@ -54,6 +56,8 @@
   (:local-nicknames (#:vinland #:foo.lisp.vinland)
                     (#:flash #:foo.lisp.flash))
   (:use #:cl)
+  (:import-from #:foo.lisp.vinland/web
+                #:route-path)
   (:import-from #:lack/middleware/user
                 #:*current-user*)
   (:export #:site-header
@@ -94,6 +98,8 @@
 (defpackage #:todo-app/view
   (:local-nicknames (#:flash #:foo.lisp.flash))
   (:use #:cl)
+  (:import-from #:foo.lisp.vinland/web
+                #:route-path)
   (:import-from #:todo-app/layout
                 #:with-main-layout)
   (:export #:about
@@ -172,6 +178,8 @@
   (:import-from #:foo.lisp.vinland/handler/simple
                 #:define-controller)
   (:import-from #:foo.lisp.vinland/web
+                #:route-url
+                #:route-path
                 #:halt
                 #:binding
                 #:body-params

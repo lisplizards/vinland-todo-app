@@ -27,6 +27,7 @@
 (defun top-level/sub-commands ()
   (list
    (start/command)
+   (list-routes/command)
    (find-route/command)))
 
 (defun start/command ()
@@ -82,14 +83,29 @@
    :worker-num (clingon:getopt cmd :worker-num)
    :debug nil))
 
+(defun list-routes/command ()
+  (clingon:make-command
+   :name "list-routes"
+   :description "List all routes matching the given prefix"
+   :options ()
+   :handler #'list-routes/handler
+   :examples '(("List all routes" . "todo-app list-routes /")
+               ("List all routes beginning with prefix '/widgets'" . "todo-app list-routes /widgets"))))
+
+(defun list-routes/handler (cmd)
+  (let ((args (clingon:command-arguments cmd)))
+    (assert (= 1 (length args))
+            nil
+            "list-routes takes exactly 1 argument: the path prefix to match")
+    (funcall todo-app/web:*router* `(:print-routes ,(first args)))))
+
 (defun find-route/command ()
   (clingon:make-command
    :name "find-route"
-   :description "Find the handler for a given path"
+   :description "Find a specific route"
    :options ()
    :handler #'find-route/handler
-   :examples '(("Find the handler for the base path" . "todo-app find-route /")
-               ("Find the handler for a dynamic path" . "todo-app find-route /widgets/abcxyz"))))
+   :examples '(("Find a route" . "todo-app find-route /"))))
 
 (defun find-route/handler (cmd)
   (let ((args (clingon:command-arguments cmd)))
@@ -99,8 +115,5 @@
     (destructuring-bind (path)
         args
       (let ((result (funcall todo-app/web:*router* `(:find-route ,path))))
-        (assert result
-                nil
-                "")
         (format t "~A" result)))))
 

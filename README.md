@@ -67,7 +67,6 @@ The binary is written to "./bin/todo-app".
 * [foo.lisp.vinland](https://github.com/lisplizards/vinland)
 * [frugal-uuid](https://github.com/ak-coram/cl-frugal-uuid)
 * [lack](https://github.com/fukamachi/lack/blob/master/lack.asd)
-* [lack-middleware-backtrace](https://github.com/fukamachi/lack/blob/master/lack-middleware-backtrace.asd)
 * [lack-middleware-session](https://github.com/fukamachi/lack/blob/master/lack-middleware-session.asd)
 * [lack-middleware-static](https://github.com/fukamachi/lack/blob/master/lack-middleware-static.asd)
 * [local-time](https://github.com/dlowe-net/local-time)
