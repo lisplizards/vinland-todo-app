@@ -22,24 +22,24 @@ Technologies:
 * Framework: [vinland](https://github.com/lisplizards/vinland)
 * JavaScript libraries: Hotwire [Turbo](https://github.com/hotwired/turbo) and [Stimulus](https://github.com/hotwired/stimulus), [Shoelace](https://shoelace.style/) web components
 
-## Known issues
-
-Rucksack does not compile on ECL.
+Tested on SBCL.
 
 ## Installation
 
-Not in Quicklisp, so clone the repository to "local-projects/".
+It is strongly recommended to use [Qlot](https://github.com/fukamachi/qlot) to manage the project dependencies.
 
-### System requirements
+Once you have Qlot installed, clone this repository and install the dependency versions specified in qlfile.lock:
 
-* [libev](http://software.schmorp.de/pkg/libev.html) (dependency of Woo)
+```sh
+qlot install
+```
 
 ### Build
 
-Build the program by running:
+After installing dependencies with Qlot, build the program by running:
 
-```lisp
-(asdf:make :vinland-todo-app)
+```sh
+qlot exec sbcl --eval '(asdf:make :vinland-todo-app)'
 ```
 
 The binary is written to ./bin/todo-app.
@@ -57,6 +57,14 @@ The application writes Rucksack data to /tmp/todo-app.
 Woo is used as the server when starting the application from the generated binary (see: src/cli.lisp).
 
 You may prefer to start the server from the REPL using clack, which allows for specifying Hunchentoot or another alternative server backend.
+
+Start a REPL, using the Qlot-installed dependencies:
+
+```sh
+qlot exec sbcl
+```
+
+Start the server:
 
 ```common-lisp
 (ql:quickload '("vinland-todo-app" "clack"))

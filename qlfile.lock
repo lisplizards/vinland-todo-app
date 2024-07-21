@@ -1,0 +1,140 @@
+("quicklisp" .
+ (:class qlot/source/dist:source-dist
+  :initargs (:distribution "https://beta.quicklisp.org/dist/quicklisp.txt" :%version :latest)
+  :version "2023-10-21"))
+("anypool" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:fukamachi/anypool.git" :branch "master")
+  :version "git-5389ec945882e87f2fc1d3e852c91aaf176556e5"))
+("lack" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:fukamachi/lack.git" :branch "master")
+  :version "git-073333bf49c950e1b5aea9fac32136461f64f68e"))
+("clack" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:fukamachi/clack.git" :branch "master")
+  :version "git-4b5ee39831e6ba45b701960343b7c1eaaef22d42"))
+("cl-bcrypt" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:dnaeon/cl-bcrypt.git" :branch "master")
+  :version "git-1d4e023dd12a49b086f15bd5e1cb8c28a14a2476"))
+("clingon" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:dnaeon/clingon.git" :branch "master")
+  :version "git-f2a730f1073e41d78557019085fbb0c662fd3189"))
+("jzon" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:Zulu-Inuoe/jzon.git" :tag "v1.1.4")
+  :version "git-99b19fb18ab3555c04564a51a990db06ed1d8a23"))
+("fast-generic-functions" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:ajberkley/fast-generic-functions" :ref "c73a5c667e80ae0dc8014db2947b6d85eb9ae6f2")
+  :version "git-c73a5c667e80ae0dc8014db2947b6d85eb9ae6f2"))
+("flash" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/flash.git" :branch "master")
+  :version "git-800626f3a8646187ea1cdcfe3e0a72d6242dbe5a"))
+("http-response" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/http-response.git" :branch "master")
+  :version "git-f1caf3e5f03dd92a834c86fd0cfff580c15f6302"))
+("lack-middleware-charset" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-charset.git" :branch "master")
+  :version "git-4b5e9212c3b7fbdcd1d2ab345c533b6abebe4c59"))
+("lack-middleware-debug" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-debug.git" :branch "master")
+  :version "git-5cb57b426758ae17000c9333e10808af64d9bd38"))
+("lack-middleware-errors" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-errors.git" :branch "master")
+  :version "git-e02390ddb3b6eeb9f97afe7dc61887a347c83ece"))
+("lack-middleware-head" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-head.git" :branch "master")
+  :version "git-f2d1478ea46962ccccea971ca6bb81537c93a9e2"))
+("lack-middleware-http-methods" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-http-methods.git" :branch "master")
+  :version "git-e8cb7d812b18381caa8509288ead57d04f30c340"))
+("lack-middleware-redis" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-redis.git" :branch "master")
+  :version "git-f959f8e704bd1d2e217aa192109914065eb56105"))
+("lack-middleware-request-id" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-request-id.git" :branch "master")
+  :version "git-a398289d0f42862d80312079d672311db703bbf7"))
+("lack-middleware-security-headers" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-security-headers.git" :branch "master")
+  :version "git-e3a9725c02b0a56000684127a562d2f8263232b3"))
+("lack-middleware-user" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-middleware-user.git" :branch "master")
+  :version "git-4884abcb5b656f814752cd81c82566bde2f5d10f"))
+("lack-request" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-request.git" :branch "master")
+  :version "git-c4d615a5358cfcca4b74b50a6fac5bbf57399eca"))
+("lack-session-store-redis-pool" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/lack-session-store-redis-pool.git" :branch "master")
+  :version "git-1ef9ad02aee13288e22858d19c428cfe6995f62d"))
+("params" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/params.git" :branch "master")
+  :version "git-62f3492240d2c48fdf5df21e629cb41edb93ba3e"))
+("print-hash" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/print-hash.git" :branch "master")
+  :version "git-ed9b688b72ffffb0170149e2e83570e41e2978c9"))
+("raven" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/raven.git" :branch "master")
+  :version "git-e2c0f4a804892b7a6d3892fd2a2f10b0f5cbc337"))
+("redact" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/redact.git" :branch "master")
+  :version "git-f6c9957f95067b283fbdb7b3eb36d2b2e3ff52f0"))
+("resource" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/resource.git" :branch "master")
+  :version "git-a2ec52c64bc15b490a2cdcd94c9fcb5fccf3d260"))
+("vinland" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:lisplizards/vinland.git" :branch "master")
+  :version "git-d254e7d4a511de6e66ef136247a24cf3daa0cc9b"))
+("frugal-uuid" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:ak-coram/cl-frugal-uuid.git" :branch "main")
+  :version "git-6101d688e791a455acc87bfa7f76f01266320507"))
+("local-time" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:dlowe-net/local-time.git" :branch "master")
+  :version "git-4fa799ac75dbffe6088ef71e712c9ab2eae7b64f"))
+("make-hash" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:genovese/make-hash.git" :branch "master")
+  :version "git-ae0909cd8e697520a1085fac6f54ac2b448ebd21"))
+("rucksack" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:arieltan/rucksack.git" :branch "master")
+  :version "git-89278f88513ef328d290aa8b2baa06d63b44a9b1"))
+("safety-params" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:fukamachi/safety-params.git" :branch "master")
+  :version "git-13e30916dfce130a6b35c22cd7969a9cba20a8f0"))
+("spinneret" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:ruricolist/spinneret.git" :branch "master")
+  :version "git-4b514008cc0a38986f699d24e89a7d46483d1687"))
+("trivia" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:guicho271828/trivia.git" :branch "master")
+  :version "git-9e38bf25c46f44c31fde689cfee09cc0aaf36176"))
+("woo" .
+ (:class qlot/source/git:source-git
+  :initargs (:remote-url "git@github.com:fukamachi/woo.git" :branch "master")
+  :version "git-eee85a423f15a627e3ec34e7329236bb39335cd7"))
