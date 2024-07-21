@@ -42,12 +42,15 @@ handled entirely by the overshield middleware")
   :GET (lambda ()
          (declare (optimize (speed 3) (safety 0) (debug 0)))
          (with-redis (:page-visits)
-           (render :headers '(:content-type "text/html")
-                   :view #'todo-app/view:about
-                   :args (list :page-hits
-                               (the integer
-                                    (or (red:get "vinland-todo-app:hits")
-                                        0))))))
+           (let* ((page-hits (red:get "vinland-todo-app:hits"))
+                  (page-hits-int (if page-hits
+                                   (parse-integer page-hits)
+                                   0)))
+             (declare (type (or null string) page-hits)
+                      (type integer page-hits-int))
+             (render :headers '(:content-type "text/html")
+                     :view #'todo-app/view:about
+                     :args (list :page-hits page-hits-int)))))
   :export t
   :documentation "About the To Do demo application")
 
@@ -102,7 +105,7 @@ handled entirely by the overshield middleware")
                                  :view #'todo-app/turbo:registration/failure
                                  :args `(:username ,username)))
                         ("text/html"
-                         (redirect (route-path 'register) `(:error ,message)))))))
+                         (redirect (route-path 'register) :flash (list :error message)))))))
               (trivia:ematch
                (validate-params (body-params))
                ((list :ok (trivia:plist :username username
@@ -197,6 +200,7 @@ handled entirely by the overshield middleware")
                       (fail :message invalid-credential-message))
                     (set-session-options '(:change-id t :new-session t :expire nil))
                     (set-session :user (make-hash
+                                        :init-format :flat
                                         :initial-contents
                                         (list :id (todo-app/dao:user-id user)
                                               :username username
@@ -204,8 +208,8 @@ handled entirely by the overshield middleware")
                     (let ((example-cookie-config (list
                                                   :value (com.inuoe.jzon:stringify
                                                           #{"foo" "bar"
-                                                          "baaz" #{"quux" "foobar"}
-                                                          "quux" (1 2 3)}
+                                                            "baaz" #{"quux" "foobar"}
+                                                            "quux" (1 2 3)}
                                                           :stream nil
                                                           :pretty nil)
                                                   :path "/"

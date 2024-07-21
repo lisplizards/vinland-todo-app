@@ -41,7 +41,8 @@ pages like login and registration that should not be accessible to signed-in use
                          (t 303))))
     (declare (type integer response-code))
     (when *current-user*
-      (halt `(,response-code (:location "/lists"))))))
+      (halt
+       (redirect "/lists" :status response-code)))))
 
 (declaim (ftype (function () null) redirect-to-sign-in))
 (defun redirect-to-sign-in ()
@@ -53,8 +54,10 @@ request. Stores the original URL in the session."
   (foo.lisp.vinland/web:set-session :origin (lack.request:request-path-info vinland:*request*))
   (redirect "/login"
             :flash '(:notice "Sign in to continue")
-            :status (case (lack.request:request-method vinland:*request*)
-                      (:GET 302)
-                      (:HEAD 302)
-                      (t 303))))
+            :status (the foo.lisp.http-response:status-code-redirect
+                         (case (lack.request:request-method vinland:*request*)
+                           (:GET 302)
+                           (:HEAD 302)
+                           (t 303))))
+  (values))
 
