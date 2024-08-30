@@ -61,7 +61,7 @@ You may prefer to start the server from the REPL using clack, which allows for s
 Start a REPL, using the Qlot-installed dependencies:
 
 ```sh
-qlot exec sbcl
+rlwrap qlot exec sbcl
 ```
 
 Start the server:

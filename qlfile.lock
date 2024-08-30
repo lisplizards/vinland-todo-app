@@ -105,7 +105,7 @@
 ("vinland" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:lisplizards/vinland.git" :branch "master")
-  :version "git-334a5c6027592ccc1503e647b94e236de7f21b1b"))
+  :version "git-3c67e913789c6a21582fe1492e6959897965230f"))
 ("frugal-uuid" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:ak-coram/cl-frugal-uuid.git" :branch "main")

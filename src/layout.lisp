@@ -3,7 +3,11 @@
 
 (in-package #:todo-app/layout)
 
-(make-hash:install-hash-reader ())
+(defparameter *importmap*
+  (foo.lisp.vinland/web:importmap
+   '(("@shoelace-style/form" . "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/utilities/form.js")
+     ("@hotwired/turbo" . "/js/vendor/turbo.es2017-esm.js")
+     ("@hotwired/stimulus" . "/js/vendor/stimulus.js"))))
 
 (defmacro with-main-layout ((&key title
                                links
@@ -23,16 +27,7 @@
        ,@(when links
            (loop for link in links
                  collect link))
-       (:script :type "importmap"
-                (:raw ,(com.inuoe.jzon:stringify
-                        #{"imports" #{
-                          "@shoelace-style/form"
-                          "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/utilities/form.js"
-                          "@hotwired/turbo" "/js/vendor/turbo.es2017-esm.js"
-                          "@hotwired/stimulus" "/js/vendor/stimulus.js"
-                        }}
-                        :stream nil
-                        :pretty nil)))
+       (:script :type "importmap" (:raw ,*importmap*))
        (:script :type "module"
                 :src "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"
                 :async t)
