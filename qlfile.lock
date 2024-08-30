@@ -13,7 +13,7 @@
 ("clack" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:fukamachi/clack.git" :branch "master")
-  :version "git-e8d97a68f7212edb193af0cd438b152db0c6f723"))
+  :version "git-4916ebb243d42d1b52f8030db146215033b1b71e"))
 ("cl-bcrypt" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:dnaeon/cl-bcrypt.git" :branch "master")
@@ -93,7 +93,7 @@
 ("raven" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:lisplizards/raven.git" :branch "master")
-  :version "git-e2c0f4a804892b7a6d3892fd2a2f10b0f5cbc337"))
+  :version "git-6a28b44db2317efef0d051d3a9cf98ea88ae2a4f"))
 ("redact" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:lisplizards/redact.git" :branch "master")
@@ -105,15 +105,15 @@
 ("vinland" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:lisplizards/vinland.git" :branch "master")
-  :version "git-a87b3ae9025eb790d0c0a0ec6048412c477c2bdd"))
+  :version "git-334a5c6027592ccc1503e647b94e236de7f21b1b"))
 ("frugal-uuid" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:ak-coram/cl-frugal-uuid.git" :branch "main")
-  :version "git-c310845c472ea214a60477fb8e33d168041a1017"))
+  :version "git-f517e822183eeb1003615aa66ed5f84e932c2c2d"))
 ("local-time" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:dlowe-net/local-time.git" :branch "master")
-  :version "git-4fa799ac75dbffe6088ef71e712c9ab2eae7b64f"))
+  :version "git-5a0955283b6ac585a8f13229bbda9f9193c59903"))
 ("make-hash" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:genovese/make-hash.git" :branch "master")
@@ -137,4 +137,4 @@
 ("woo" .
  (:class qlot/source/git:source-git
   :initargs (:remote-url "git@github.com:fukamachi/woo.git" :branch "master")
-  :version "git-eee85a423f15a627e3ec34e7329236bb39335cd7"))
+  :version "git-c839148c20f3dc8e0fddc4b5a5426a30736c7fe4"))
